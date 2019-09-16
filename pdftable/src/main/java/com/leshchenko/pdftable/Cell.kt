@@ -7,7 +7,6 @@ import java.io.FileNotFoundException
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
-
 class Cell(
     var preferences: Preferences? = null,
     private val data: String,
@@ -46,9 +45,9 @@ class Cell(
         val rect = RectF(startPoint.x, startPoint.y, right, bottom)
         if (_preferences.drawBorders) canvas.drawRect(rect, bordersPaint)
         canvas.drawRect(
-            rect.left + _preferences.lineWidth /2,
-            rect.top + _preferences.lineWidth /2 ,
-            rect.right - _preferences.lineWidth /  2,
+            rect.left + _preferences.lineWidth / 2,
+            rect.top + _preferences.lineWidth / 2,
+            rect.right - _preferences.lineWidth / 2,
             rect.bottom - _preferences.lineWidth / 2,
             backgroundPaint
         )
@@ -74,20 +73,21 @@ class Cell(
         var topY = rect.top + _preferences.textMargin.top
         if (_preferences.drawBorders) canvas.drawRect(rect, bordersPaint)
         canvas.drawRect(
-            rect.left + _preferences.lineWidth /2,
-            rect.top + _preferences.lineWidth /2 ,
-            rect.right - _preferences.lineWidth /  2,
+            rect.left + _preferences.lineWidth / 2,
+            rect.top + _preferences.lineWidth / 2,
+            rect.right - _preferences.lineWidth / 2,
             rect.bottom - _preferences.lineWidth / 2,
             backgroundPaint
         )
 
+        val stringLines = getStringLines()
         val textX = when (_preferences.alignType) {
             AlignTypes.LEFT -> rect.left + _preferences.textMargin.left
-            AlignTypes.CENTER -> rect.left + (width / 2) - (paint.getTextSize(data).width() / 2)
-            AlignTypes.RIGHT -> rect.left + width - paint.getTextSize(data).width() - _preferences.textMargin.right
+            AlignTypes.CENTER -> rect.left + (width / 2) - (paint.getTextSize(stringLines.first()).width() / 2)
+            AlignTypes.RIGHT -> rect.left + width - paint.getTextSize(stringLines.first()).width() - _preferences.textMargin.right
         }
 
-        getStringLines().forEach { textLine ->
+        stringLines.forEach { textLine ->
             canvas.drawText(
                 textLine,
                 textX,
