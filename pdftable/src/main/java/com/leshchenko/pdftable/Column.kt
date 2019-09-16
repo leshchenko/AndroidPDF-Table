@@ -32,7 +32,16 @@ class Column(
 
     fun setColumnHeight(height: Float) {
         this.height = height
-        cells.forEach { it.cellHeight = height / cells.size }
+        var availableHeight = height / cells.size
+        cells.forEachIndexed { index, cell ->
+            val estimatedHeight = cell.getEstimatedHeight()
+            if (estimatedHeight > availableHeight) {
+                cell.cellHeight = estimatedHeight
+                availableHeight = (height - estimatedHeight) / (cells.size - (index + 1))
+            } else {
+                cell.cellHeight = availableHeight
+            }
+        }
     }
 
     fun isDrawn() = cells.all { it.isDrawn }
