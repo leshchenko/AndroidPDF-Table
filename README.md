@@ -106,7 +106,7 @@ allprojects {
  implementation 'com.github.leshchenko:AndroidPDF-Table:1.0.2'
 ```
 ### Did it help you?
-<link href="https://fonts.googleapis.com/css?family=Lato&subset=latin,latin-ext" rel="stylesheet"><a class="bmc-button" target="_blank" href="https://www.buymeacoffee.com/4JyfS7Bw2"><img src="https://bmc-cdn.nyc3.digitaloceanspaces.com/BMC-button-images/BMC-btn-logo.svg" alt="Buy me a coffee"><span style="margin-left:5px">Buy me a coffee</span></a>
+[Buy me a cup of coffee](https://www.buymeacoffee.com/4JyfS7Bw2) [![](https://bmc-cdn.nyc3.digitaloceanspaces.com/BMC-button-images/BMC-btn-logo.svg)](https://www.buymeacoffee.com/4JyfS7Bw2)
 
 ### LICENSE
 ```
