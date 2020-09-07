@@ -144,12 +144,16 @@ class Cell(
 
         var line = ""
         data.split(" ").forEach { word ->
-            line += (if (line.isEmpty()) word else " $word")
-                    .replace(System.lineSeparator(), "")
-            if (paint.getTextSize(line + word).width() > getMaxContentWidth() ||
-                    word.endsWith(System.lineSeparator())) {
-                stringLines.add(line)
+            if (word.contains(System.lineSeparator())) {
                 line = ""
+                word.split(System.lineSeparator()).forEach { subLine -> stringLines.add(subLine) }
+            } else {
+                line += if (line.isEmpty()) word else " $word"
+                if (paint.getTextSize(line + word).width() > getMaxContentWidth() ||
+                        word.endsWith(System.lineSeparator())) {
+                    stringLines.add(line)
+                    line = ""
+                }
             }
         }
         if (line.isNotEmpty()) stringLines.add(line)
