@@ -143,7 +143,7 @@ class Cell(
         val stringLines = mutableListOf<String>()
 
         var line = ""
-        data.split(" ").forEach { word ->
+        data.split(" ", System.lineSeparator()).forEach { word ->
             if (paint.getTextSize(line + word).width() > getMaxContentWidth()) {
                 stringLines.add(line)
                 line = ""
