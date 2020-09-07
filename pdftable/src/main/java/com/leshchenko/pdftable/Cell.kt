@@ -130,11 +130,11 @@ class Cell(
 
     private fun getTextHeight(): Float {
         val textSize = paint.getTextSize(data)
-        if (textSize.width() > getMaxContentWidth()) {
+        return if (textSize.width() > getMaxContentWidth()) {
             val stringLines = getStringLines()
-            return ((textSize.height() + _preferences.verticalTextSpacing) * stringLines.size.toFloat())
+            ((textSize.height() + _preferences.verticalTextSpacing) * stringLines.size.toFloat())
         } else {
-            return textSize.height().toFloat()
+            textSize.height().toFloat()
         }
 
     }
@@ -145,8 +145,13 @@ class Cell(
         var line = ""
         data.split(" ").forEach { word ->
             if (word.contains(System.lineSeparator())) {
+                val subLines = word.split(System.lineSeparator())
+                val firstSubLine = subLines.firstOrNull() ?: ""
+                line += if (line.isEmpty()) firstSubLine else " $firstSubLine"
+                stringLines.add(line)
                 line = ""
-                word.split(System.lineSeparator()).forEach { subLine -> stringLines.add(subLine) }
+                subLines.drop(1).dropLast(1).forEach { line -> stringLines.add(line) }
+                line += subLines.lastOrNull() ?: ""
             } else {
                 line += if (line.isEmpty()) word else " $word"
                 if (paint.getTextSize(line + word).width() > getMaxContentWidth() ||
@@ -220,6 +225,7 @@ class Cell(
                 paint.color = textColor
                 paint.typeface = typeface
                 paint.textSize = textSize
+                paint.isUnderlineText = underLined
             }
         }
     }

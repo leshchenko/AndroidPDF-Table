@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity() {
                 cells = listOf(
                     Cell(
                         data = "Centered text",
-                        preferences = Preferences(alignType = AlignTypes.CENTER)
+                        preferences = Preferences(alignType = AlignTypes.CENTER, underLined = true)
                     )
                 )
             )
