@@ -1,6 +1,7 @@
 package com.leshchenko.pdftable
 
 import android.graphics.*
+import android.text.TextPaint
 import android.util.Log
 import java.io.FileInputStream
 import java.io.FileNotFoundException
@@ -80,14 +81,38 @@ class Cell(
                 backgroundPaint
         )
 
+
         val stringLines = getStringLines()
-        val textX = when (_preferences.alignType) {
-            AlignTypes.LEFT -> rect.left + _preferences.textMargin.left
-            AlignTypes.CENTER -> rect.left + (width / 2) - (paint.getTextSize(stringLines.first()).width() / 2)
-            AlignTypes.RIGHT -> rect.left + width - paint.getTextSize(stringLines.first()).width() - _preferences.textMargin.right
+
+        // TODO: migrate to StaticLayout
+        /*val textAlignment = when(_preferences.alignType) {
+            AlignTypes.LEFT -> Layout.Alignment.ALIGN_NORMAL
+            AlignTypes.CENTER -> Layout.Alignment.ALIGN_CENTER
+            AlignTypes.RIGHT -> Layout.Alignment.ALIGN_OPPOSITE
         }
 
+        canvas.save()
+        canvas.translate(
+            rect.left + _preferences.textMargin.left / 2 - _preferences.textMargin.right / 2,
+            rect.top + _preferences.textMargin.top
+        )
+
+        val textWidth = rect.width().toInt() - _preferences.textMargin.right.toInt()
+        StaticLayout
+            .Builder
+            .obtain(data, 0, data.length, paint, textWidth)
+            .setLineSpacing(_preferences.verticalTextSpacing, 1.0f)
+            .setAlignment(textAlignment)
+            .build()
+            .draw(canvas)*/
+
         stringLines.forEach { textLine ->
+            val textX = when (_preferences.alignType) {
+                AlignTypes.LEFT -> rect.left + _preferences.textMargin.left
+                AlignTypes.CENTER -> rect.left + (width / 2) - (paint.getTextSize(textLine).width() / 2)
+                AlignTypes.RIGHT -> rect.left + width - paint.getTextSize(textLine).width() - _preferences.textMargin.right
+            }
+
             canvas.drawText(
                     textLine,
                     textX,
@@ -96,6 +121,7 @@ class Cell(
             )
             topY += paint.getTextSize(textLine).height() + _preferences.verticalTextSpacing
         }
+//        canvas.restore()
         isDrawn = true
     }
 
@@ -153,11 +179,11 @@ class Cell(
                 subLines.drop(1).dropLast(1).forEach { line -> stringLines.add(line) }
                 line += subLines.lastOrNull() ?: ""
             } else {
-                line += if (line.isEmpty()) word else " $word"
-                if (paint.getTextSize(line + word).width() > getMaxContentWidth() ||
-                        word.endsWith(System.lineSeparator())) {
+                if (paint.getTextSize(line + word).width() > getMaxContentWidth()) {
                     stringLines.add(line)
                     line = ""
+                } else {
+                    line += if (line.isEmpty()) word else " $word"
                 }
             }
         }
@@ -219,13 +245,13 @@ class Cell(
     }
 
     private val paint by lazy {
-        Paint().also { paint ->
+        TextPaint().also { paint ->
             paint.isAntiAlias = true
             with(_preferences) {
                 paint.color = textColor
                 paint.typeface = typeface
                 paint.textSize = textSize
-                paint.isUnderlineText = underLined
+                paint.isUnderlineText = underLinedText
             }
         }
     }

@@ -18,13 +18,22 @@ class MainActivity : AppCompatActivity() {
         val outputStream = File(getExternalFilesDir(null)?.absolutePath + "test.pdf").outputStream()
         val rows = mutableListOf<Row>()
         val columns = mutableListOf<Column>()
-        columns.add(Column(cells = listOf(Cell(data = "Just a very long text to show you text\nline breaking: Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test"))))
+        columns.add(
+            Column(
+                cells = listOf(
+                    Cell(
+                        data = "The laboratory tests showed the result of the above data in Takasi system showed that the result of the above data was Negative, as the sample was taken on xx/xx/xxxx.\nUpon his request, this scene was given to whomever may concern.\nAccordingly, this report has been written at xx/xx/xxxx.",
+                        preferences = Preferences(alignType = AlignTypes.LEFT)
+                    )
+                )
+            )
+        )
         columns.add(
             Column(
                 cells = listOf(
                     Cell(
                         data = "Centered text",
-                        preferences = Preferences(alignType = AlignTypes.CENTER, underLined = true)
+                        preferences = Preferences(alignType = AlignTypes.CENTER, underLinedText = true)
                     )
                 )
             )

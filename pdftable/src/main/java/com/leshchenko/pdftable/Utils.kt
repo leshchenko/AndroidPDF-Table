@@ -21,7 +21,7 @@ class Preferences(
     @ColorInt val textColor: Int = Color.BLACK,
     val textSize: Float = 10f,
     val typeface: Typeface = Typeface.DEFAULT,
-    val underLined: Boolean = false,
+    val underLinedText: Boolean = false,
     val lineWidth: Float = 1f,
     @ColorInt val backgroundColor: Int = Color.WHITE,
     val textMargin: Margins = Margins(),
