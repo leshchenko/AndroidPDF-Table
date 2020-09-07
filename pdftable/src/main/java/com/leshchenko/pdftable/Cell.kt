@@ -8,9 +8,9 @@ import kotlin.math.ceil
 import kotlin.math.roundToInt
 
 class Cell(
-    var preferences: Preferences? = null,
-    private val data: String,
-    private val dataType: DataTypes = DataTypes.TEXT
+        var preferences: Preferences? = null,
+        private val data: String,
+        private val dataType: DataTypes = DataTypes.TEXT
 ) {
     var width = 0f
     var cellHeight = 0f
@@ -45,11 +45,11 @@ class Cell(
         val rect = RectF(startPoint.x, startPoint.y, right, bottom)
         if (_preferences.drawBorders) canvas.drawRect(rect, bordersPaint)
         canvas.drawRect(
-            rect.left + _preferences.lineWidth / 2,
-            rect.top + _preferences.lineWidth / 2,
-            rect.right - _preferences.lineWidth / 2,
-            rect.bottom - _preferences.lineWidth / 2,
-            backgroundPaint
+                rect.left + _preferences.lineWidth / 2,
+                rect.top + _preferences.lineWidth / 2,
+                rect.right - _preferences.lineWidth / 2,
+                rect.bottom - _preferences.lineWidth / 2,
+                backgroundPaint
         )
 
         val outputOptions = BitmapFactory.Options()
@@ -62,7 +62,7 @@ class Cell(
 
     private fun drawText(canvas: Canvas) {
         val bottom =
-            startPoint.y + cellHeight
+                startPoint.y + cellHeight
         if (bottom >= canvas.height) {
             isDrawn = false
             return
@@ -73,11 +73,11 @@ class Cell(
         var topY = rect.top + _preferences.textMargin.top
         if (_preferences.drawBorders) canvas.drawRect(rect, bordersPaint)
         canvas.drawRect(
-            rect.left + _preferences.lineWidth / 2,
-            rect.top + _preferences.lineWidth / 2,
-            rect.right - _preferences.lineWidth / 2,
-            rect.bottom - _preferences.lineWidth / 2,
-            backgroundPaint
+                rect.left + _preferences.lineWidth / 2,
+                rect.top + _preferences.lineWidth / 2,
+                rect.right - _preferences.lineWidth / 2,
+                rect.bottom - _preferences.lineWidth / 2,
+                backgroundPaint
         )
 
         val stringLines = getStringLines()
@@ -89,10 +89,10 @@ class Cell(
 
         stringLines.forEach { textLine ->
             canvas.drawText(
-                textLine,
-                textX,
-                topY + paint.getTextSize(textLine).height(),
-                paint
+                    textLine,
+                    textX,
+                    topY + paint.getTextSize(textLine).height(),
+                    paint
             )
             topY += paint.getTextSize(textLine).height() + _preferences.verticalTextSpacing
         }
@@ -123,10 +123,10 @@ class Cell(
     }
 
     private fun maxContentHeight() =
-        cellHeight - _preferences.textMargin.top - _preferences.textMargin.bottom
+            cellHeight - _preferences.textMargin.top - _preferences.textMargin.bottom
 
     private fun getMaxContentWidth() =
-        width - _preferences.textMargin.left - _preferences.textMargin.right
+            width - _preferences.textMargin.left - _preferences.textMargin.right
 
     private fun getTextHeight(): Float {
         val textSize = paint.getTextSize(data)
@@ -143,12 +143,13 @@ class Cell(
         val stringLines = mutableListOf<String>()
 
         var line = ""
-        data.split(" ", System.lineSeparator()).forEach { word ->
-            if (paint.getTextSize(line + word).width() > getMaxContentWidth()) {
+        data.split(" ").forEach { word ->
+            line += (if (line.isEmpty()) word else " $word")
+                    .replace(System.lineSeparator(), "")
+            if (paint.getTextSize(line + word).width() > getMaxContentWidth() ||
+                    word.endsWith(System.lineSeparator())) {
                 stringLines.add(line)
                 line = ""
-            } else {
-                line += if (line.isEmpty()) word else " $word"
             }
         }
         if (line.isNotEmpty()) stringLines.add(line)
@@ -185,7 +186,7 @@ class Cell(
     }
 
     private fun getMaxHeight() =
-        A4_HEIGHT_IN_PIXELS - _preferences.tableMargins.top - _preferences.tableMargins.bottom
+            A4_HEIGHT_IN_PIXELS - _preferences.tableMargins.top - _preferences.tableMargins.bottom
 
     fun setCellPreferences(preferences: Preferences) {
         if (this.preferences == null) this.preferences = preferences
