@@ -22,8 +22,8 @@ class MainActivity : AppCompatActivity() {
             Column(
                 cells = listOf(
                     Cell(
-                        data = "The laboratory tests showed the result of the above data in Takasi system showed that the result of the above data was Negative, as the sample was taken on xx/xx/xxxx.\nUpon his request, this scene was given to whomever may concern.\nAccordingly, this report has been written at xx/xx/xxxx.",
-                        preferences = Preferences(alignType = AlignTypes.LEFT)
+                        data = "Just a very long text to show you text line breaking: Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test",
+                        preferences = Preferences(alignType = AlignTypes.LEFT, textSize = 14f)
                     )
                 )
             )

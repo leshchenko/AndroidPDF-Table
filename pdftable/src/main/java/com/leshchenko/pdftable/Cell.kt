@@ -173,13 +173,18 @@ class Cell(
             if (word.contains(System.lineSeparator())) {
                 val subLines = word.split(System.lineSeparator())
                 val firstSubLine = subLines.firstOrNull() ?: ""
-                line += if (line.isEmpty()) firstSubLine else " $firstSubLine"
-                stringLines.add(line)
+                if (haveEnoughSpace(line, firstSubLine)) {
+                    line += if (line.isEmpty()) firstSubLine else " $firstSubLine"
+                    stringLines.add(line)
+                } else {
+                    stringLines.add(line)
+                    stringLines.add(firstSubLine)
+                }
                 line = ""
                 subLines.drop(1).dropLast(1).forEach { line -> stringLines.add(line) }
                 line += subLines.lastOrNull() ?: ""
             } else {
-                if (paint.getTextSize(line + word).width() > getMaxContentWidth()) {
+                if (!haveEnoughSpace(line, word)) {
                     stringLines.add(line)
                     line = ""
                 } else {
@@ -189,6 +194,10 @@ class Cell(
         }
         if (line.isNotEmpty()) stringLines.add(line)
         return stringLines
+    }
+
+    private fun haveEnoughSpace(line: String, append: String): Boolean {
+        return paint.getTextSize(line + append).width() < getMaxContentWidth()
     }
 
     fun getEstimatedHeight(): Float {
