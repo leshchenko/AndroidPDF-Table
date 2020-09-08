@@ -1,6 +1,7 @@
 package com.leshchenko.pdftable
 
 import android.graphics.*
+import android.text.TextPaint
 import android.util.Log
 import java.io.FileInputStream
 import java.io.FileNotFoundException
@@ -8,9 +9,9 @@ import kotlin.math.ceil
 import kotlin.math.roundToInt
 
 class Cell(
-    var preferences: Preferences? = null,
-    private val data: String,
-    private val dataType: DataTypes = DataTypes.TEXT
+        var preferences: Preferences? = null,
+        private val data: String,
+        private val dataType: DataTypes = DataTypes.TEXT
 ) {
     var width = 0f
     var cellHeight = 0f
@@ -45,11 +46,11 @@ class Cell(
         val rect = RectF(startPoint.x, startPoint.y, right, bottom)
         if (_preferences.drawBorders) canvas.drawRect(rect, bordersPaint)
         canvas.drawRect(
-            rect.left + _preferences.lineWidth / 2,
-            rect.top + _preferences.lineWidth / 2,
-            rect.right - _preferences.lineWidth / 2,
-            rect.bottom - _preferences.lineWidth / 2,
-            backgroundPaint
+                rect.left + _preferences.lineWidth / 2,
+                rect.top + _preferences.lineWidth / 2,
+                rect.right - _preferences.lineWidth / 2,
+                rect.bottom - _preferences.lineWidth / 2,
+                backgroundPaint
         )
 
         val outputOptions = BitmapFactory.Options()
@@ -62,7 +63,7 @@ class Cell(
 
     private fun drawText(canvas: Canvas) {
         val bottom =
-            startPoint.y + cellHeight
+                startPoint.y + cellHeight
         if (bottom >= canvas.height) {
             isDrawn = false
             return
@@ -73,29 +74,54 @@ class Cell(
         var topY = rect.top + _preferences.textMargin.top
         if (_preferences.drawBorders) canvas.drawRect(rect, bordersPaint)
         canvas.drawRect(
-            rect.left + _preferences.lineWidth / 2,
-            rect.top + _preferences.lineWidth / 2,
-            rect.right - _preferences.lineWidth / 2,
-            rect.bottom - _preferences.lineWidth / 2,
-            backgroundPaint
+                rect.left + _preferences.lineWidth / 2,
+                rect.top + _preferences.lineWidth / 2,
+                rect.right - _preferences.lineWidth / 2,
+                rect.bottom - _preferences.lineWidth / 2,
+                backgroundPaint
         )
 
+
         val stringLines = getStringLines()
-        val textX = when (_preferences.alignType) {
-            AlignTypes.LEFT -> rect.left + _preferences.textMargin.left
-            AlignTypes.CENTER -> rect.left + (width / 2) - (paint.getTextSize(stringLines.first()).width() / 2)
-            AlignTypes.RIGHT -> rect.left + width - paint.getTextSize(stringLines.first()).width() - _preferences.textMargin.right
+
+        // TODO: migrate to StaticLayout
+        /*val textAlignment = when(_preferences.alignType) {
+            AlignTypes.LEFT -> Layout.Alignment.ALIGN_NORMAL
+            AlignTypes.CENTER -> Layout.Alignment.ALIGN_CENTER
+            AlignTypes.RIGHT -> Layout.Alignment.ALIGN_OPPOSITE
         }
 
+        canvas.save()
+        canvas.translate(
+            rect.left + _preferences.textMargin.left / 2 - _preferences.textMargin.right / 2,
+            rect.top + _preferences.textMargin.top
+        )
+
+        val textWidth = rect.width().toInt() - _preferences.textMargin.right.toInt()
+        StaticLayout
+            .Builder
+            .obtain(data, 0, data.length, paint, textWidth)
+            .setLineSpacing(_preferences.verticalTextSpacing, 1.0f)
+            .setAlignment(textAlignment)
+            .build()
+            .draw(canvas)*/
+
         stringLines.forEach { textLine ->
+            val textX = when (_preferences.alignType) {
+                AlignTypes.LEFT -> rect.left + _preferences.textMargin.left
+                AlignTypes.CENTER -> rect.left + (width / 2) - (paint.getTextSize(textLine).width() / 2)
+                AlignTypes.RIGHT -> rect.left + width - paint.getTextSize(textLine).width() - _preferences.textMargin.right
+            }
+
             canvas.drawText(
-                textLine,
-                textX,
-                topY + paint.getTextSize(textLine).height(),
-                paint
+                    textLine,
+                    textX,
+                    topY + paint.getTextSize(textLine).height(),
+                    paint
             )
             topY += paint.getTextSize(textLine).height() + _preferences.verticalTextSpacing
         }
+//        canvas.restore()
         isDrawn = true
     }
 
@@ -123,18 +149,18 @@ class Cell(
     }
 
     private fun maxContentHeight() =
-        cellHeight - _preferences.textMargin.top - _preferences.textMargin.bottom
+            cellHeight - _preferences.textMargin.top - _preferences.textMargin.bottom
 
     private fun getMaxContentWidth() =
-        width - _preferences.textMargin.left - _preferences.textMargin.right
+            width - _preferences.textMargin.left - _preferences.textMargin.right
 
     private fun getTextHeight(): Float {
         val textSize = paint.getTextSize(data)
-        if (textSize.width() > getMaxContentWidth()) {
+        return if (textSize.width() > getMaxContentWidth()) {
             val stringLines = getStringLines()
-            return ((textSize.height() + _preferences.verticalTextSpacing) * stringLines.size.toFloat())
+            ((textSize.height() + _preferences.verticalTextSpacing) * stringLines.size.toFloat())
         } else {
-            return textSize.height().toFloat()
+            textSize.height().toFloat()
         }
 
     }
@@ -144,15 +170,34 @@ class Cell(
 
         var line = ""
         data.split(" ").forEach { word ->
-            if (paint.getTextSize(line + word).width() > getMaxContentWidth()) {
-                stringLines.add(line)
+            if (word.contains(System.lineSeparator())) {
+                val subLines = word.split(System.lineSeparator())
+                val firstSubLine = subLines.firstOrNull() ?: ""
+                if (haveEnoughSpace(line, firstSubLine)) {
+                    line += if (line.isEmpty()) firstSubLine else " $firstSubLine"
+                    stringLines.add(line)
+                } else {
+                    stringLines.add(line)
+                    stringLines.add(firstSubLine)
+                }
                 line = ""
+                subLines.drop(1).dropLast(1).forEach { line -> stringLines.add(line) }
+                line += subLines.lastOrNull() ?: ""
             } else {
-                line += if (line.isEmpty()) word else " $word"
+                if (!haveEnoughSpace(line, word)) {
+                    stringLines.add(line)
+                    line = ""
+                } else {
+                    line += if (line.isEmpty()) word else " $word"
+                }
             }
         }
         if (line.isNotEmpty()) stringLines.add(line)
         return stringLines
+    }
+
+    private fun haveEnoughSpace(line: String, append: String): Boolean {
+        return paint.getTextSize(line + append).width() < getMaxContentWidth()
     }
 
     fun getEstimatedHeight(): Float {
@@ -185,7 +230,7 @@ class Cell(
     }
 
     private fun getMaxHeight() =
-        A4_HEIGHT_IN_PIXELS - _preferences.tableMargins.top - _preferences.tableMargins.bottom
+            A4_HEIGHT_IN_PIXELS - _preferences.tableMargins.top - _preferences.tableMargins.bottom
 
     fun setCellPreferences(preferences: Preferences) {
         if (this.preferences == null) this.preferences = preferences
@@ -209,12 +254,13 @@ class Cell(
     }
 
     private val paint by lazy {
-        Paint().also { paint ->
+        TextPaint().also { paint ->
             paint.isAntiAlias = true
             with(_preferences) {
                 paint.color = textColor
                 paint.typeface = typeface
                 paint.textSize = textSize
+                paint.isUnderlineText = underLinedText
             }
         }
     }

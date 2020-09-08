@@ -3,8 +3,8 @@ package com.leshchenko.pdftableexample
 import android.content.Context
 import android.graphics.Color
 import android.graphics.Typeface
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import com.leshchenko.pdftable.*
 import java.io.File
 import java.io.IOException
@@ -18,13 +18,22 @@ class MainActivity : AppCompatActivity() {
         val outputStream = File(getExternalFilesDir(null)?.absolutePath + "test.pdf").outputStream()
         val rows = mutableListOf<Row>()
         val columns = mutableListOf<Column>()
-        columns.add(Column(cells = listOf(Cell(data = "Just a very long text to show you text line breaking: Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test"))))
+        columns.add(
+            Column(
+                cells = listOf(
+                    Cell(
+                        data = "Just a very long text to show you text line breaking: Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test Test test",
+                        preferences = Preferences(alignType = AlignTypes.LEFT, textSize = 14f)
+                    )
+                )
+            )
+        )
         columns.add(
             Column(
                 cells = listOf(
                     Cell(
                         data = "Centered text",
-                        preferences = Preferences(alignType = AlignTypes.CENTER)
+                        preferences = Preferences(alignType = AlignTypes.CENTER, underLinedText = true)
                     )
                 )
             )
